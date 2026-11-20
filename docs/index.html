@@ -59,6 +59,12 @@ td.num,th.num{text-align:right}
 .scroll{overflow-x:auto;max-height:560px;overflow-y:auto;border:1px solid var(--line);border-radius:12px}
 .scroll thead th{position:sticky;top:0;background:var(--bg)}
 .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,48px)}
+.tl{list-style:none;margin:0;padding:0;border-left:3px solid var(--acc);margin-left:8px}
+.tl li{position:relative;padding:0 0 22px 24px}
+.tl li::before{content:"";position:absolute;left:-9px;top:6px;width:15px;height:15px;border-radius:50%;background:var(--bg);border:3px solid var(--acc)}
+.tl .yr{font:600 22px/1.1 Fraunces,Georgia,serif}
+.tl p{margin:4px 0 0;color:var(--mute);max-width:72ch}
+pre.lean{background:var(--card);border-radius:12px;padding:16px;overflow-x:auto;font:13px/1.5 "JetBrains Mono",ui-monospace,monospace}
 .tasks li{margin:0 0 12px}
 .note{font-size:13px;color:var(--mute)}
 a{color:var(--acc)}
@@ -71,7 +77,7 @@ html{scroll-padding-top:60px}
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
 </head>
 <body>
-<nav class="nav" aria-label="Sections"><a href="#strata">Layers</a><a href="#live">Live status</a><a href="#spine">Proof spine</a><a href="#folders">Where the code is</a><a href="#deps">Dependencies</a><a href="#literature">Literature</a><a href="#tasks">Open tasks</a><a href="#method">Method</a></nav>
+<nav class="nav" aria-label="Sections"><a href="#strata">Layers</a><a href="#live">Live status</a><a href="#spine">Proof spine</a><a href="#lineage">Euclid to Alpöge</a><a href="#folders">Where the code is</a><a href="#deps">Dependencies</a><a href="#literature">Literature</a><a href="#tasks">Open tasks</a><a href="#method">Method</a></nav>
 
 <header class="band" id="strata"><div class="wrap">
   <h1>A map of the claimed Lean proof of the Riemann Hypothesis</h1>
@@ -94,6 +100,49 @@ html{scroll-padding-top:60px}
   <h2>The proof spine, top down</h2>
   <p class="sec-intro">The logical chain from the headline theorem down to the first deep input, read from the proof terms. Lean names are exact; plain-language glosses are marked as readings, to be checked by specialists.</p>
   <ol class="spine" id="spineList"></ol>
+</div></section>
+
+<section class="band" id="lineage"><div class="wrap">
+  <h2>From Euclid to Alpöge: 2,300 years of primes, one checker</h2>
+  <p class="sec-intro">The claimed proof is the latest step in a line of results about how prime numbers are distributed. Most earlier steps are already checked by the same Lean kernel, in Mathlib or in community projects.</p>
+  <ol class="tl">
+    <li><span class="yr">c. 300 BC · Euclid</span><p>There are infinitely many primes (<i>Elements</i> IX.20). In Mathlib: <code>Nat.exists_infinite_primes</code>. Re-proved below in 24 lines.</p></li>
+    <li><span class="yr">1737 · Euler</span><p>The sum over all n of n<sup>−s</sup> equals a product over all primes: primes meet analysis. In Mathlib: <code>riemannZeta_eulerProduct</code>, alongside Euler’s ζ(2) = π²/6 as <code>riemannZeta_two</code> (Loeffler–Stoll).</p></li>
+    <li><span class="yr">1837 · Dirichlet</span><p>Infinitely many primes in every admissible arithmetic progression, via L-functions. In Mathlib: <code>Nat.setOf_prime_and_eq_mod_infinite</code> (Loeffler–Stoll).</p></li>
+    <li><span class="yr">1859 · Riemann</span><p>“Ueber die Anzahl der Primzahlen unter einer gegebenen Grösse”: counting primes through the zeros of ζ; the hypothesis appears in passing. In Mathlib: <code>riemannZeta</code>, the functional equation <code>riemannZeta_one_sub</code>, and the statement <code>RiemannHypothesis</code>.</p></li>
+    <li><span class="yr">1896 · Hadamard, de la Vallée Poussin</span><p>The prime number theorem: about x / log x primes up to x. Its key input, ζ(s) ≠ 0 on Re s = 1, is in Mathlib as <code>riemannZeta_ne_zero_of_one_le_re</code>; the theorem itself was formalized by the PrimeNumberTheoremAnd project led by A. Kontorovich and T. Tao.</p></li>
+    <li><span class="yr">Aug 2026 · Claude</span><p>More than two thirds of the zeros of ζ proved simple and on the critical line (previous record 41.6 %), with a Lean formalization reviewed by Anthropic mathematicians and outside experts.</p></li>
+    <li><span class="yr">20 Nov 2026 · Alpöge with Claude</span><p>Claimed proof of RH and GRH for Dirichlet L-functions, Lean only. This page.</p></li>
+  </ol>
+  <h3 style="font:600 20px Fraunces,serif;margin:18px 0 6px">Euclid in Lean, checked on 21 Nov 2026</h3>
+  <p class="sec-intro">The ancient argument (n! + 1 has a prime factor larger than n), written out with comments in German, then the same axiom audit everyone is waiting for on the RH proof. Output: <code>'euklid' depends on axioms: [propext, Classical.choice, Quot.sound]</code>. Paste it into <a href="https://live.lean-lang.org">live.lean-lang.org</a> to check it yourself.</p>
+  <pre class="lean">import Mathlib
+
+/-- Euklid, Elemente IX.20: Über jeder Zahl n liegt eine Primzahl.
+    Also gibt es unendlich viele Primzahlen. -/
+theorem euklid (n : ℕ) : ∃ p, n ≤ p ∧ Nat.Prime p := by
+  -- Euklids Trick: die Zahl n! + 1 (Produkt aller Zahlen bis n, plus 1)
+  -- p sei ihr kleinster Primteiler
+  let p := Nat.minFac (Nat.factorial n + 1)
+  -- n! + 1 ist nicht 1, also hat sie einen Primteiler
+  have hf : Nat.factorial n + 1 ≠ 1 := ne_of_gt (Nat.succ_lt_succ (Nat.factorial_pos n))
+  have hp : Nat.Prime p := Nat.minFac_prime hf
+  -- zu zeigen bleibt: p ist mindestens n
+  refine ⟨p, ?_, hp⟩
+  -- Annahme des Gegenteils: p &lt; n
+  by_contra h
+  push_neg at h
+  -- dann teilt p die Zahl n! (p kommt im Produkt 1·2·…·n vor)
+  have h1 : p ∣ Nat.factorial n := Nat.dvd_factorial (Nat.minFac_pos _) h.le
+  -- p teilt auch n! + 1 (so war p gewählt)
+  have h2 : p ∣ Nat.factorial n + 1 := Nat.minFac_dvd _
+  -- also teilt p die Differenz, nämlich 1
+  have h3 : p ∣ 1 := (Nat.dvd_add_right h1).mp h2
+  -- aber eine Primzahl teilt 1 nicht: Widerspruch
+  exact hp.one_lt.ne&#x27; (Nat.dvd_one.mp h3)
+
+#print axioms euklid
+</pre>
 </div></section>
 
 <section class="band" id="folders"><div class="wrap two">
