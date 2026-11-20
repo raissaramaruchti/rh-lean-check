@@ -71,7 +71,7 @@ html{scroll-padding-top:60px}
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
 </head>
 <body>
-<nav class="nav" aria-label="Sections"><a href="#strata">Layers</a><a href="#spine">Proof spine</a><a href="#folders">Where the code is</a><a href="#deps">Dependencies</a><a href="#literature">Literature</a><a href="#tasks">Open tasks</a><a href="#method">Method</a></nav>
+<nav class="nav" aria-label="Sections"><a href="#strata">Layers</a><a href="#live">Live status</a><a href="#spine">Proof spine</a><a href="#folders">Where the code is</a><a href="#deps">Dependencies</a><a href="#literature">Literature</a><a href="#tasks">Open tasks</a><a href="#method">Method</a></nav>
 
 <header class="band" id="strata"><div class="wrap">
   <h1>A map of the claimed Lean proof of the Riemann Hypothesis</h1>
@@ -82,6 +82,13 @@ html{scroll-padding-top:60px}
   <div class="legend" id="legend"></div>
   <p class="note">Each column is one import layer: depth 1 modules import only Mathlib, depth 203 is <code>Main</code>. Height = lines of Lean in that layer. The bulk of the code sits low: infrastructure, then a long thin chain up to the main theorem.</p>
 </div></header>
+
+<section class="band" id="live" style="padding-top:0"><div class="wrap">
+  <h2>Live check status</h2>
+  <p class="sec-intro">Read directly from the result files of <a href="https://github.com/raissaramaruchti/rh-lean-check">rh-lean-check</a> each time this page loads.</p>
+  <div class="kpis" id="liveK"><div class="kpi"><b>…</b><span>loading</span></div></div>
+  <p class="note" id="liveNote"></p>
+</div></section>
 
 <section class="band" id="spine"><div class="wrap">
   <h2>The proof spine, top down</h2>
@@ -194,6 +201,17 @@ function pubs(){const q=$('pq').value.trim().toLowerCase();const L=D.pubs.filter
  $('pt').tBodies[0].innerHTML=L.map(p=>`<tr><td><code>${esc(p.n)}</code></td><td class="num">${fmt(p.refs)}</td><td>${p.proved?'yes':'not found'}</td></tr>`).join('')||'<tr><td colspan="3">No statement matches.</td></tr>'}
 [['pAll','all'],['pProved','p'],['pOpen','o']].forEach(([id,m])=>$(id).addEventListener('click',()=>{mode=m;['pAll','pProved','pOpen'].forEach(x=>$(x).setAttribute('aria-pressed',x===id));pubs()}));
 $('pq').addEventListener('input',pubs);pubs();
+const RAW='https://raw.githubusercontent.com/raissaramaruchti/rh-lean-check/main/';
+async function get(p){try{const r=await fetch(RAW+p+'?t='+Date.now(),{cache:'no-store'});return r.ok?(await r.text()).trim():null}catch(e){return null}}
+(async()=>{
+  const [st,last,fin,ax,bfin,bax]=await Promise.all(['results/status.txt','results/last_run.txt','results/FINAL','results/axioms.txt','results-build-missing/FINAL','results-build-missing/axioms.txt'].map(get));
+  const m=st&&st.match(/(\d+)\/(\d+) required/);
+  const verdict=(f,a)=>{if(!f)return['pending','not finished'];const rc=(f.match(/exit_code=(\S+)/)||[])[1];if(rc==='0'){const ok=a&&/propext/.test(a)&&!/sorryAx/.test(a);return[ok?'passed':'see report',a?a.split('\n').slice(0,3).join(' '):'']}return['stopped','exit code '+(rc||'?')]};
+  const v1=verdict(fin,ax),v2=verdict(bfin,bax);
+  $('liveK').innerHTML=[[m?Math.round(m[1]/m[2]*100)+' %':'–',m?`Omega shards published (${fmt(+m[1])} / ${fmt(+m[2])})`:'shard coverage unavailable'],[v1[0],'full replay (waits for all shards)'],[v2[0],'build-missing run']].map(([b,s])=>`<div class="kpi"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join('');
+  $('liveNote').innerHTML=(last?`Last hourly check: ${esc(last)} UTC. `:'')+(ax&&fin?`Axioms (full replay): <code>${esc(ax.slice(0,400))}</code> `:'')+(bax&&bfin?`Axioms (build-missing): <code>${esc(bax.slice(0,400))}</code>`:'')+(!st?'Result files could not be read right now.':'');
+})();
+
 }
 </script>
 </body>
