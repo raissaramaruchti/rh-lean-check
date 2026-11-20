@@ -2,6 +2,8 @@
 
 Independent re-run of a **fresh Lean kernel replay and axiom audit** for the Lean formalization that Levent Alpöge announced on 2026-11-20 as a proof of the Riemann Hypothesis (and GRH for Dirichlet L-functions), found working with Claude.
 
+**Map of the proof:** <https://raissaramaruchti.github.io/rh-lean-check/>: import layers, the proof spine from `riemannHypothesis` down to the theta-lift input, where the 17.4 M lines sit, and a searchable catalogue of the 561 `GlobalTheory.Published.*` literature statements.
+
 This repository contains **no proof code**. It only holds two GitHub Actions workflows and the results they write back.
 
 > **Status:** claimed proof, not yet independently confirmed. A passing run here is evidence about the formal artifact, not a mathematical review.
