@@ -76,6 +76,11 @@ pre.lean{background:var(--card);border-radius:12px;padding:16px;overflow-x:auto;
 .stages b{display:block;font:600 17px/1.25 Fraunces,Georgia,serif;margin-bottom:2px}
 .stages .when{font-size:13px;color:var(--acc);font-weight:600}
 .stages p{margin:6px 0 0;font-size:14px;color:var(--mute)}
+.assess{margin:22px 0 0;background:var(--card);border-left:5px solid var(--acc);border-radius:0 12px 12px 0;padding:18px 22px;max-width:900px}
+.assess .lbl{font-size:13px;font-weight:600;color:var(--acc);margin-bottom:6px}
+.assess blockquote{margin:0;font:500 clamp(18px,2.1vw,22px)/1.4 Fraunces,Georgia,serif}
+.assess ul{margin:12px 0 0;padding-left:18px;font-size:14px;color:var(--mute)}
+.assess li{margin:3px 0}
 .tasks li{margin:0 0 12px}
 .note{font-size:13px;color:var(--mute)}
 a{color:var(--acc)}
@@ -94,6 +99,15 @@ html{scroll-padding-top:60px}
   <h1>A map of the claimed Lean proof of the Riemann Hypothesis</h1>
   <p class="lede">Orientation for readers of Levent Alpöge’s formalization (announced 20 Nov 2026, found with Claude). This is a guide to the code’s structure, not a verification and not a review of the mathematics. Status of the proof: claimed; independently compiled by A. Sutherland (MIT) per Scientific American; axiom report pending.</p>
   <p class="by">Prepared by Raissa Ruchti with Claude (Anthropic) · source: unmodified mirror CocoSgt/riemann-hypothesis-lean · analysed 20 Nov 2026</p>
+  <div class="assess" id="assessment">
+    <div class="lbl">Assessment · Raissa Ruchti</div>
+    <blockquote>If the reported formal verification is accurate and the formal theorem genuinely expresses RH without hidden assumptions, then this is substantially more than an ordinary proof claim. It would constitute a rigorous formal proof.</blockquote>
+    <ul>
+      <li><b>The theorem expresses RH:</b> checked. The headline theorem proves Mathlib’s own <code>RiemannHypothesis</code>, with no redefinition in the project.</li>
+      <li><b>No hidden assumptions:</b> source scan clean (no <code>axiom</code>, <code>sorry</code>, <code>native_decide</code>); the decisive <code>#print axioms</code> report is pending (<a href="#live">live status</a>).</li>
+      <li><b>Verification accurate:</b> independently compiled per Scientific American; fresh kernel replay and Comparator runs pending.</li>
+    </ul>
+  </div>
   <div class="kpis" id="kpis"></div>
   <div class="fig"><svg id="strataSvg" role="img" aria-label="Lines of code per import depth, stacked by top-level folder, from depth 1 (just above Mathlib) to depth 203 (Main)"></svg></div>
   <div class="legend" id="legend"></div>
