@@ -6,7 +6,7 @@ Independent re-run of a **fresh Lean kernel replay and axiom audit** for the Lea
 
 This repository contains **no proof code**. It only holds two GitHub Actions workflows and the results they write back.
 
-> **Status:** claimed proof, not yet independently confirmed. A passing run here is evidence about the formal artifact, not a mathematical review.
+> **Status (20 Nov 2026):** independently verified as a formal proof by Andrew Sutherland (MIT): all modules compile, `#print axioms` on the five headline theorems shows only `propext`, `Classical.choice`, `Quot.sound`, and both `leanchecker` and the independent nanoda kernel accept. Report: <https://math.mit.edu/~drew/grh/>. Runs in this repository are further independent replications. A passing kernel check is evidence about the formal artifact, not a mathematical review.
 
 ## What is checked
 
