@@ -65,6 +65,17 @@ td.num,th.num{text-align:right}
 .tl .yr{font:600 22px/1.1 Fraunces,Georgia,serif}
 .tl p{margin:4px 0 0;color:var(--mute);max-width:72ch}
 pre.lean{background:var(--card);border-radius:12px;padding:16px;overflow-x:auto;font:13px/1.5 "JetBrains Mono",ui-monospace,monospace}
+.mp{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.mpc{background:var(--card);border-radius:12px;padding:14px 16px;border-top:4px solid var(--line)}
+.mpc.solved{border-top-color:light-dark(#1f6b3a,#7fd49d)}.mpc.claim{border-top-color:var(--acc)}.mpc.part{border-top-color:var(--c0)}
+.mpc h4{margin:0 0 4px;font:600 17px/1.25 Fraunces,Georgia,serif}
+.mpc .st{font-size:13px;font-weight:600;margin-bottom:6px}
+.mpc p{margin:0;font-size:14px;color:var(--mute)}
+.stages{counter-reset:st;list-style:none;padding:0;margin:0 0 26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.stages li{background:var(--card);border-radius:12px;padding:14px 16px}
+.stages b{display:block;font:600 17px/1.25 Fraunces,Georgia,serif;margin-bottom:2px}
+.stages .when{font-size:13px;color:var(--acc);font-weight:600}
+.stages p{margin:6px 0 0;font-size:14px;color:var(--mute)}
 .tasks li{margin:0 0 12px}
 .note{font-size:13px;color:var(--mute)}
 a{color:var(--acc)}
@@ -77,7 +88,7 @@ html{scroll-padding-top:60px}
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
 </head>
 <body>
-<nav class="nav" aria-label="Sections"><a href="#strata">Layers</a><a href="#live">Live status</a><a href="#spine">Proof spine</a><a href="#folders">Where the code is</a><a href="#deps">Dependencies</a><a href="#literature">Literature</a><a href="#lineage">Euclid to Alpöge</a><a href="#tasks">Open tasks</a><a href="#method">Method</a></nav>
+<nav class="nav" aria-label="Sections"><a href="#strata">Layers</a><a href="#live">Live status</a><a href="#spine">Proof spine</a><a href="#folders">Where the code is</a><a href="#deps">Dependencies</a><a href="#literature">Literature</a><a href="#lineage">Euclid to Alpöge</a><a href="#millennium">Millennium Problems</a><a href="#tasks">What’s awaited</a><a href="#method">Method</a></nav>
 
 <header class="band" id="strata"><div class="wrap">
   <h1>A map of the claimed Lean proof of the Riemann Hypothesis</h1>
@@ -178,7 +189,29 @@ theorem euklid (n : ℕ) : ∃ p, n ≤ p ∧ Nat.Prime p := by
 </pre>
 </div></section>
 
+<section class="band" id="millennium"><div class="wrap">
+  <h2>The seven Millennium Prize Problems, November 2026</h2>
+  <p class="sec-intro">Clay Mathematics Institute, 2000; $1 M each. Officially solved: one. Clay’s own labels as of September 2026: Poincaré solved, Navier–Stokes “active”, the rest unsolved. Claims below are listed as claims.</p>
+  <div class="mp">
+    <div class="mpc solved"><h4>Poincaré conjecture</h4><div class="st">Solved · Perelman 2002–03, recognized 2010</div><p>The only one Clay has declared solved, after roughly four years of community checking. Perelman declined the prize.</p></div>
+    <div class="mpc claim"><h4>Riemann hypothesis</h4><div class="st">Claimed · Alpöge with Claude, 20 Nov 2026</div><p>Lean-only proof of RH and GRH for Dirichlet L-functions; independently compiled; axiom report and Comparator pending. This page.</p></div>
+    <div class="mpc claim"><h4>Navier–Stokes existence and smoothness</h4><div class="st">Claimed · OpenAI, 8 Sep 2026 · Clay: “active”</div><p>Proof plus Lean formalization that a smooth fluid can blow up in finite time, under smooth forcing (statements C/D of the official problem); OpenAI says it will not claim the prize. Credit dispute with Buckmaster and Alpöge, who posted Lean-verified blow-up results for related fluid equations a day earlier. Mathematicians call it likely correct but so far hard to learn from.</p></div>
+    <div class="mpc part"><h4>Hodge conjecture</h4><div class="st">Open · special case claimed (OpenAI, 30 Sep 2026)</div><p>Paper “The rational Hodge conjecture for CM abelian varieties”: an important family of cases, not the general conjecture. Under review.</p></div>
+    <div class="mpc"><h4>Birch and Swinnerton-Dyer conjecture</h4><div class="st">Open</div><p>Strong partial results for small analytic rank; no claimed full proof from a recognized source.</p></div>
+    <div class="mpc"><h4>P versus NP</h4><div class="st">Open</div><p>Most researchers expect P ≠ NP; no accepted proof in either direction.</p></div>
+    <div class="mpc"><h4>Yang–Mills existence and mass gap</h4><div class="st">Open</div><p>Many unrefereed preprints in 2026, none accepted. Rigorous partial results exist on the lattice at strong coupling.</p></div>
+  </div>
+  <p class="note">Sources: <a href="https://mathworld.wolfram.com/MillenniumPrizeProblems.html">MathWorld (Clay status as of 11 Sep 2026)</a> · <a href="https://openai.com/index/navier-stokes-solution/">OpenAI, Navier–Stokes</a> · <a href="https://www.npr.org/2026/09/22/nx-s1-5968588/openai-navier-stokes-problem-mathematicians-learn-little">NPR on reception</a> · <a href="https://axios.com/2026/09/08/openai-math-solution-navier-stokes-credit">Axios on the credit dispute</a> · <a href="https://officechai.com/ai/hodge-conjecture-abelian-varieties/">Hodge for CM abelian varieties</a></p>
+</div></section>
+
 <section class="band" id="tasks"><div class="wrap">
+  <h2>What everyone is waiting for</h2>
+  <p class="sec-intro">Three stages, in order. A green kernel check settles correctness, not understanding.</p>
+  <ol class="stages">
+    <li><span class="when">hours to days</span><b>1 · The axiom report</b><p><code>#print axioms riemannHypothesis</code> from an independent full build. Clean means only <code>propext</code>, <code>Classical.choice</code>, <code>Quot.sound</code>: no hidden assumption, no gap. Sutherland’s compile (reported by Scientific American) does not yet include a published axiom list.</p></li>
+    <li><span class="when">days</span><b>2 · Independent checkers</b><p>The Lean kernel is itself a program. The Omega Institute’s Comparator run re-checks the proof with four independently written checkers (Lean paranoid, nanoda, con-leche, con-ron). If all accept, the formal proof is as secure as formal proofs get.</p></li>
+    <li><span class="when">months to years</span><b>3 · Understanding</b><p>Why does the argument work? Which idea is new, which of the 561 literature statements are load-bearing, and can 17.4 M lines be condensed into something a person can read? Only then would a journal publish it; Clay considers a solution at the earliest two years after publication.</p></li>
+  </ol>
   <h2>Open tasks for readers</h2>
   <ol class="tasks">
     <li><b>Axiom report.</b> <code>#print axioms</code> on the five theorems in <code>Main.lean</code>; expected <code>propext</code>, <code>Classical.choice</code>, <code>Quot.sound</code> only. Runs: Omega Institute, and <a href="https://github.com/raissaramaruchti/rh-lean-check">rh-lean-check</a>.</li>
