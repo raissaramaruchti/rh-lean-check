@@ -1,0 +1,129 @@
+name: Verify claimed RH proof (fresh kernel replay)
+
+# Re-runs the Omega Institute verifier on independent GitHub hardware:
+# restores their published, SHA-256-checked build shards, replays every
+# declaration of Main in an empty environment with `leanchecker --fresh`,
+# and audits the axioms of the five headline theorems.
+# Runs hourly until all shards are published, then once for real.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+concurrency:
+  group: rh-verify
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    permissions:
+      contents: read
+    outputs:
+      ran: ${{ steps.gate.outputs.ran }}
+    steps:
+      - name: Own repo (to see whether a final result already exists)
+        uses: actions/checkout@v4
+        with:
+          path: self
+          persist-credentials: false
+
+      - name: Skip if a final result is already recorded
+        id: done
+        run: |
+          if [ -f self/results/FINAL ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; else echo "skip=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Check out the Omega Institute verifier
+        if: steps.done.outputs.skip == 'false'
+        uses: actions/checkout@v4
+        with:
+          repository: the-omega-institute/riemann-hypothesis
+          ref: main
+          path: omega
+          persist-credentials: false
+
+      - name: Free disk space
+        if: steps.done.outputs.skip == 'false'
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          df -h /
+
+      - name: Shard coverage
+        if: steps.done.outputs.skip == 'false'
+        id: status
+        working-directory: omega
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          git rev-parse HEAD > "$GITHUB_WORKSPACE/out/omega_commit.txt"
+          python3 ./verify --status Main | tee "$GITHUB_WORKSPACE/out/status.txt"
+          line=$(tail -n 1 "$GITHUB_WORKSPACE/out/status.txt")
+          have=$(echo "$line" | sed -E 's/.*: ([0-9]+)\/([0-9]+) required.*/\1/')
+          need=$(echo "$line" | sed -E 's/.*: ([0-9]+)\/([0-9]+) required.*/\2/')
+          echo "have=$have need=$need"
+          if [ -n "$have" ] && [ "$have" = "$need" ]; then echo "complete=true" >> "$GITHUB_OUTPUT"; else echo "complete=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Install elan (no default toolchain)
+        if: steps.status.outputs.complete == 'true'
+        run: |
+          curl --fail --silent --show-error --location --retry 3 https://elan.lean-lang.org/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          sudo apt-get install -y zstd
+
+      - name: Restore shards, fresh kernel replay, axiom audit
+        if: steps.status.outputs.complete == 'true'
+        id: run
+        working-directory: omega
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+          start=$(date -u +%FT%TZ)
+          rc=0
+          python3 ./verify Main 2>&1 | tee "$GITHUB_WORKSPACE/out/verify.log" || rc=$?
+          echo "started=$start finished=$(date -u +%FT%TZ) exit_code=$rc" > "$GITHUB_WORKSPACE/out/FINAL"
+          cp .lake/parts/axioms.txt "$GITHUB_WORKSPACE/out/axioms.txt" 2>/dev/null || echo "no axioms.txt produced" > "$GITHUB_WORKSPACE/out/axioms.txt"
+          tail -n 200 "$GITHUB_WORKSPACE/out/verify.log" > "$GITHUB_WORKSPACE/out/verify_tail.log"
+          rm "$GITHUB_WORKSPACE/out/verify.log"
+          free -g >> "$GITHUB_WORKSPACE/out/FINAL"; df -h / >> "$GITHUB_WORKSPACE/out/FINAL"
+
+      - name: Gate
+        id: gate
+        if: always() && steps.done.outputs.skip == 'false'
+        run: echo "ran=true" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.done.outputs.skip == 'false'
+        with:
+          name: results
+          path: out/
+          if-no-files-found: ignore
+
+  record:
+    needs: verify
+    if: always() && needs.verify.outputs.ran == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: results
+          path: incoming
+      - name: Commit results
+        run: |
+          mkdir -p results
+          cp -r incoming/. results/
+          date -u +%FT%TZ > results/last_run.txt
+          echo "${{ needs.verify.result }}" > results/last_job_result.txt
+          git config user.name "rh-verify-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add results
+          git commit -m "Verifier run $(date -u +%FT%TZ)" || exit 0
+          git push
