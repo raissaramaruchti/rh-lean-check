@@ -99,14 +99,14 @@ html{scroll-padding-top:60px}
   <h1>A map of the Lean proof of the Riemann Hypothesis</h1>
   <p class="lede" style="font-weight:600;color:var(--ink)">Formally verified on 20 November 2026 by independent kernels. Not yet understood, peer-reviewed or recognized by the Clay Institute.</p>
   <p class="lede">Orientation for readers of Levent Alpöge’s formalization (announced 20 Nov 2026, found with Claude). This is a guide to the code’s structure, not a verification and not a review of the mathematics. Status of the proof: formally verified by an independent checker: per <a href="https://math.mit.edu/~drew/grh/">Sutherland’s verification report (MIT)</a> (20 Nov 2026), all 175,187 modules compile, <code>#print axioms</code> shows only the three standard axioms, and both Lean’s <code>leanchecker</code> and the independent nanoda kernel accept the proof. Human understanding of the argument is still outstanding.</p>
-  <p class="by">Prepared by Raissa Ruchti with Claude (Anthropic) · source: unmodified mirror CocoSgt/riemann-hypothesis-lean · analysed 20 Nov 2026</p>
+  <p class="by">Prepared by Raissa Ruchti with Claude (Anthropic) · source: unmodified mirror CocoSgt/riemann-hypothesis-lean · analysed 20 Nov 2026 · text last updated 21 Nov 2026, 01:15 CET (MIT report as of 20 Nov, 19:45 UTC)</p>
   <div class="assess" id="assessment">
     <div class="lbl">Assessment · Raissa Ruchti</div>
     <blockquote>If the reported formal verification is accurate and the formal theorem genuinely expresses RH without hidden assumptions, then this is substantially more than an ordinary proof claim. It would constitute a rigorous formal proof.</blockquote>
     <ul>
       <li><b>The theorem expresses RH:</b> checked. The headline theorem proves Mathlib’s own <code>RiemannHypothesis</code>, with no redefinition in the project.</li>
       <li><b>No hidden assumptions:</b> confirmed. The five headline theorems depend only on <code>propext</code>, <code>Classical.choice</code>, <code>Quot.sound</code> (<a href="https://math.mit.edu/~drew/grh/">Sutherland’s verification report (MIT)</a>); source scan also clean.</li>
-      <li><b>Verification accurate:</b> confirmed by two kernels. Compiled with zero errors; <code>leanchecker</code> replayed every module with no rejections; the independent nanoda kernel accepted the full export. Still running there: Lean’s paranoid kernel and an end-to-end Comparator run. Two further checkers (con-leche, con-ron) declined because they do not support a feature used in the proof; that is not a rejection.</li>
+      <li><b>Verification accurate:</b> confirmed by two kernels. Compiled with zero errors; <code>leanchecker</code> replayed every module with no rejections; the independent nanoda kernel accepted the full export. Still running there: Lean’s default and paranoid kernels and an end-to-end Comparator run (its statement comparison and axiom check have already passed). Two further checkers (con-leche, con-ron) declined because they do not support a feature used in the proof; that is not a rejection. Caveat noted in the report: the build was not sandboxed and called <code>lean</code> directly; only a 77-module sample was compared with a regular <code>lake build</code>.</li>
     </ul>
   </div>
   <div class="kpis" id="kpis"></div>
@@ -163,7 +163,7 @@ html{scroll-padding-top:60px}
 
 <section class="band" id="lineage"><div class="wrap">
   <h2>From Euclid to Alpöge: 2,300 years of primes, one checker</h2>
-  <p class="sec-intro">The claimed proof is the latest step in a line of results about how prime numbers are distributed. Most earlier steps are already checked by the same Lean kernel, in Mathlib or in community projects.</p>
+  <p class="sec-intro">The formally verified proof is the latest step in a line of results about how prime numbers are distributed. Most earlier steps are already checked by the same Lean kernel, in Mathlib or in community projects.</p>
   <ol class="tl">
     <li><span class="yr">c. 300 BC · Euclid</span><p>There are infinitely many primes (<i>Elements</i> IX.20). In Mathlib: <code>Nat.exists_infinite_primes</code>. Re-proved below in 24 lines.</p></li>
     <li><span class="yr">1737 · Euler</span><p>The sum over all n of n<sup>−s</sup> equals a product over all primes: primes meet analysis. In Mathlib: <code>riemannZeta_eulerProduct</code>, alongside Euler’s ζ(2) = π²/6 as <code>riemannZeta_two</code> (Loeffler–Stoll).</p></li>
@@ -171,10 +171,10 @@ html{scroll-padding-top:60px}
     <li><span class="yr">1859 · Riemann</span><p>“Ueber die Anzahl der Primzahlen unter einer gegebenen Grösse”: counting primes through the zeros of ζ; the hypothesis appears in passing: “Hiervon wäre allerdings ein strenger Beweis zu wünschen; ich habe indess die Aufsuchung desselben nach einigen flüchtigen vergeblichen Versuchen vorläufig bei Seite gelassen …” <span class="note">Source: Bernhard Riemann, „Ueber die Anzahl der Primzahlen unter einer gegebenen Grösse“, <i>Monatsberichte der Königlich Preußischen Akademie der Wissenschaften zu Berlin</i>, November 1859; title and quotation in the original spelling. Transcription: <a href="https://www.claymath.org/library/historical/riemann/german/1.pdf">Clay Mathematics Institute</a>; autograph manuscript: SUB Göttingen, Cod. Ms. B. Riemann 3.</span> In Mathlib: <code>riemannZeta</code>, the functional equation <code>riemannZeta_one_sub</code>, and the statement <code>RiemannHypothesis</code>.</p></li>
     <li><span class="yr">1896 · Hadamard, de la Vallée Poussin</span><p>The prime number theorem: about x / log x primes up to x. Its key input, ζ(s) ≠ 0 on Re s = 1, is in Mathlib as <code>riemannZeta_ne_zero_of_one_le_re</code>; the theorem itself was formalized by the PrimeNumberTheoremAnd project led by A. Kontorovich and T. Tao.</p></li>
     <li><span class="yr">Aug 2026 · Claude</span><p>More than two thirds of the zeros of ζ proved simple and on the critical line (previous record 41.6 %), with a Lean formalization reviewed by Anthropic mathematicians and outside experts.</p></li>
-    <li><span class="yr">20 Nov 2026 · Alpöge with Claude</span><p>Claimed proof of RH and GRH for Dirichlet L-functions, Lean only. This page.</p></li>
+    <li><span class="yr">20 Nov 2026 · Alpöge with Claude</span><p>Proof of RH and GRH for Dirichlet L-functions, released as Lean code only; formally verified by independent kernels the same night (Sutherland, MIT). Not yet understood or peer-reviewed. This page.</p></li>
   </ol>
   <h3 style="font:600 20px Fraunces,serif;margin:18px 0 6px">Euclid in Lean, checked on 21 Nov 2026</h3>
-  <p class="sec-intro">The ancient argument (n! + 1 has a prime factor larger than n), written out with comments in German, then the same axiom audit everyone is waiting for on the RH proof. Output: <code>'euklid' depends on axioms: [propext, Classical.choice, Quot.sound]</code>. Paste it into <a href="https://live.lean-lang.org">live.lean-lang.org</a> to check it yourself.</p>
+  <p class="sec-intro">The ancient argument (n! + 1 has a prime factor larger than n), written out with comments in German, then the same axiom audit Sutherland ran on the RH proof, with the same result. Output: <code>'euklid' depends on axioms: [propext, Classical.choice, Quot.sound]</code>. Paste it into <a href="https://live.lean-lang.org">live.lean-lang.org</a> to check it yourself.</p>
   <pre class="lean">import Mathlib
 
 /-- Euklid, Elemente IX.20: Über jeder Zahl n liegt eine Primzahl.
@@ -224,7 +224,7 @@ theorem euklid (n : ℕ) : ∃ p, n ≤ p ∧ Nat.Prime p := by
   <p class="sec-intro">Three stages, in order. A green kernel check settles correctness, not understanding.</p>
   <ol class="stages">
     <li><span class="when">done · 20 Nov 2026</span><b>1 · The axiom report</b><p><code>#print axioms</code> on the five headline theorems from an independent full build: only <code>propext</code>, <code>Classical.choice</code>, <code>Quot.sound</code>. No hidden assumption, no gap. Source: <a href="https://math.mit.edu/~drew/grh/">Sutherland’s verification report (MIT)</a>.</p></li>
-    <li><span class="when">largely done</span><b>2 · Independent checkers</b><p>The Lean kernel is itself a program. The Omega Institute’s Comparator run re-checks the proof with four independently written checkers (Lean paranoid, nanoda, con-leche, con-ron). If all accept, the formal proof is as secure as formal proofs get. So far: <code>leanchecker</code> and the independent nanoda kernel accept; paranoid kernel and Comparator still running; con-leche and con-ron cannot handle a feature of the proof (not a rejection).</p></li>
+    <li><span class="when">largely done</span><b>2 · Independent checkers</b><p>The Lean kernel is itself a program. The Omega Institute’s Comparator run re-checks the proof with four independently written checkers (Lean paranoid, nanoda, con-leche, con-ron). If all accept, the formal proof is as secure as formal proofs get. So far: <code>leanchecker</code> and the independent nanoda kernel accept; Lean’s default and paranoid kernels and the full Comparator run still running (statement comparison and axiom check passed); con-leche and con-ron cannot handle a feature of the proof (not a rejection).</p></li>
     <li><span class="when">months to years</span><b>3 · Understanding</b><p>Why does the argument work? Which idea is new, which of the 561 literature statements are load-bearing, and can 17.4 M lines be condensed into something a person can read? Only then would a journal publish it; Clay considers a solution at the earliest two years after publication.</p></li>
   </ol>
   <h2>Open tasks for readers</h2>
@@ -300,14 +300,15 @@ function pubs(){const q=$('pq').value.trim().toLowerCase();const L=D.pubs.filter
 $('pq').addEventListener('input',pubs);pubs();
 const RAW='https://raw.githubusercontent.com/raissaramaruchti/rh-lean-check/main/';
 async function get(p){try{const r=await fetch(RAW+p+'?t='+Date.now(),{cache:'no-store'});return r.ok?(await r.text()).trim():null}catch(e){return null}}
-(async()=>{
+async function liveRefresh(){
   const [st,last,fin,ax,bfin,bax]=await Promise.all(['results/status.txt','results/last_run.txt','results/FINAL','results/axioms.txt','results-build-missing/FINAL','results-build-missing/axioms.txt'].map(get));
   const m=st&&st.match(/(\d+)\/(\d+) required/);
   const verdict=(f,a)=>{if(!f)return['pending','not finished'];const rc=(f.match(/exit_code=(\S+)/)||[])[1];if(rc==='0'){const ok=a&&/propext/.test(a)&&!/sorryAx/.test(a);return[ok?'passed':'see report',a?a.split('\n').slice(0,3).join(' '):'']}return['stopped','exit code '+(rc||'?')]};
   const v1=verdict(fin,ax),v2=verdict(bfin,bax);
   $('liveK').innerHTML=[[m?Math.round(m[1]/m[2]*100)+' %':'–',m?`Omega shards published (${fmt(+m[1])} / ${fmt(+m[2])})`:'shard coverage unavailable'],[v1[0],'full replay (waits for all shards)'],[v2[0],'build-missing run']].map(([b,s])=>`<div class="kpi"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join('');
-  $('liveNote').innerHTML=(last?`Last hourly check: ${esc(last)} UTC. `:'')+(ax&&fin?`Axioms (full replay): <code>${esc(ax.slice(0,400))}</code> `:'')+(bax&&bfin?`Axioms (build-missing): <code>${esc(bax.slice(0,400))}</code>`:'')+(!st?'Result files could not be read right now.':'');
-})();
+  $('liveNote').innerHTML=(last?`Last run of the check: ${esc(last.replace('T',' ').replace('Z',''))} UTC. `:'')+`Page refreshed ${new Date().toLocaleTimeString()} (every 60 s). `+(ax&&fin?`Axioms (full replay): <code>${esc(ax.slice(0,400))}</code> `:'')+(bax&&bfin?`Axioms (build-missing): <code>${esc(bax.slice(0,400))}</code>`:'')+(!st?'Result files could not be read right now.':'');
+}
+liveRefresh(); setInterval(liveRefresh,60000);
 
 }
 </script>
