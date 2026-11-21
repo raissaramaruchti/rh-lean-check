@@ -4,14 +4,14 @@ name: Verify claimed RH proof (fresh kernel replay)
 # restores their published, SHA-256-checked build shards, replays every
 # declaration of Main in an empty environment with `leanchecker --fresh`,
 # and audits the axioms of the five headline theorems.
-# Runs hourly until all shards are published, then once for real.
+# Runs every 15 minutes until all shards are published, then once for real.
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: "17 * * * *"
+    - cron: "*/15 * * * *"
 
 concurrency:
   group: rh-verify
